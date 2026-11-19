@@ -156,7 +156,7 @@ export function HeeingRabbitArt({ className }: CharacterArtProps) {
       {/* 오른손 + 작은 목검 */}
       <g transform="translate(113 142)">
         <g className="art-sword">
-          <g transform="rotate(24)">
+          <g transform="rotate(24) scale(1.18)">
             <path d="M0 -38 C 5 -33 6 -22 6 -6 L-6 -6 C -6 -22 -5 -33 0 -38 Z" fill="#f6fbff" />
             <path d="M0 -38 C 5 -33 6 -22 6 -6 L2 -6 C 3 -22 2.5 -31 0 -38 Z" fill="#cfe6f1" />
             <path

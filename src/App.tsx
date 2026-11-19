@@ -134,6 +134,7 @@ function BattleArena() {
       <div className="fighter fighter--hero">
         <div className="fighter__shadow" aria-hidden="true" />
         <div className="fighter__lunge">
+          <span className="dash-trail" aria-hidden="true" />
           <CharacterSprite character={BATTLE_HERO} />
         </div>
         <span className="fighter__name">{BATTLE_HERO.name}</span>

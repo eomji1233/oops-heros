@@ -23,6 +23,7 @@
   --ground-h: 340px;
   --feet: 188px;
   --cycle: 2.4s;
+  --lunge: 38px;
 
   /* 공통 */
   --page-x: 14px;
@@ -130,12 +131,32 @@ body {
     0 0 0 6px rgba(255, 247, 196, 0.6);
 }
 
-.bg__clouds {
+.bg__clouds,
+.bg__twinkles {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 160px;
+  height: 260px;
+}
+
+.bg__birds {
+  position: absolute;
+  top: 116px;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+}
+
+/* 성 뒤에 걸린 은은한 무지개 */
+.bg__rainbow {
+  position: absolute;
+  bottom: calc(var(--ground-h) + 70px);
+  left: 0;
+  width: 100%;
+  height: 220px;
+  opacity: 0.4;
 }
 
 .bg__layer {
@@ -172,7 +193,7 @@ body {
 }
 
 .bg__tree--right {
-  right: -36px;
+  right: -54px;
   width: 98px;
   height: 180px;
   transform: scaleX(-1);
@@ -224,6 +245,60 @@ body {
   width: 5px;
   height: 5px;
   animation-delay: -5.5s;
+}
+
+.bg__petal {
+  position: absolute;
+  top: 190px;
+  left: 0;
+  width: 9px;
+  height: 6px;
+  border-radius: 80% 20% 80% 20%;
+  background-color: #ffc2d1;
+  opacity: 0;
+  animation: petal-fall 11s linear infinite;
+}
+
+.bg__petal--a {
+  animation-delay: -1s;
+}
+
+.bg__petal--b {
+  top: 150px;
+  animation-delay: -5s;
+  animation-duration: 13s;
+}
+
+.bg__petal--c {
+  top: 230px;
+  animation-delay: -8s;
+  animation-duration: 15s;
+}
+
+.bg-bird {
+  animation: bird-fly 34s linear infinite;
+}
+
+.bg-bird--b {
+  animation-duration: 42s;
+  animation-delay: -16s;
+}
+
+.bg-bird--c {
+  animation-duration: 38s;
+  animation-delay: -27s;
+}
+
+.bg-bird__body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: bird-flap 0.7s ease-in-out infinite alternate;
+}
+
+.bg-twinkle {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: twinkle 3.2s ease-in-out infinite;
 }
 
 .bg-cloud {
@@ -451,31 +526,34 @@ body {
 }
 
 .fighter--hero {
-  left: 28%;
+  left: 26%;
 }
 
 .fighter--monster {
-  left: 72%;
+  left: 74%;
 }
 
 .fighter__shadow {
   position: absolute;
   bottom: -9px;
   left: 50%;
-  width: 96px;
-  height: 18px;
+  width: 112px;
+  height: 20px;
   border-radius: 50%;
-  background-color: rgba(70, 120, 55, 0.32);
+  background-color: rgba(60, 110, 48, 0.38);
+  box-shadow: 0 0 0 5px rgba(60, 110, 48, 0.12);
   transform: translateX(-50%);
 }
 
 .fighter--monster .fighter__shadow {
-  width: 110px;
+  width: 126px;
 }
 
 .fighter__lunge,
 .fighter__recoil {
   position: relative;
+  z-index: 1;
+  transform-origin: 50% 100%;
 }
 
 .fighter__lunge {
@@ -484,6 +562,23 @@ body {
 
 .fighter__recoil {
   animation: monster-recoil var(--cycle) ease-out infinite;
+}
+
+/* 돌진 중에만 보이는 속도선 */
+.dash-trail {
+  position: absolute;
+  bottom: 34px;
+  left: -40px;
+  width: 54px;
+  height: 46px;
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95)) 0 6px / 100% 6px no-repeat,
+    linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85)) 10px 20px / 44px 6px no-repeat,
+    linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9)) 4px 34px / 50px 6px no-repeat;
+  border-radius: 999px;
+  transform-origin: 100% 50%;
+  animation: dash-trail var(--cycle) ease-out infinite;
 }
 
 .fighter__name {
@@ -505,7 +600,8 @@ body {
 .sprite {
   width: var(--sprite-width);
   aspect-ratio: var(--sprite-ratio);
-  filter: drop-shadow(0 3px 0 rgba(122, 85, 70, 0.18));
+  /* 배경과 분리되어 보이도록 은은한 흰 테두리 빛 + 바닥 그림자 */
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95)) drop-shadow(0 4px 0 rgba(122, 85, 70, 0.2));
 }
 
 .sprite__art,
@@ -551,7 +647,7 @@ body {
 
 .nameplate {
   position: absolute;
-  bottom: calc(100% + 30px);
+  bottom: calc(100% + 46px);
   left: 50%;
   width: 166px;
   padding: 6px 9px 7px;
@@ -680,15 +776,16 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 4;
 }
 
+/* 베기 이펙트는 슬라임 왼쪽 어깨 가장자리에, 얼굴을 가리지 않게 배치 */
 .impact__slash {
   position: absolute;
-  bottom: 24px;
+  z-index: 2;
+  bottom: 42px;
   left: -34px;
-  width: 66px;
-  height: 66px;
+  width: 62px;
+  height: 62px;
   opacity: 0;
   filter: drop-shadow(0 2px 0 rgba(122, 85, 70, 0.3));
   animation: slash var(--cycle) ease-out infinite;
@@ -696,36 +793,39 @@ body {
 
 .impact__spark {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
   opacity: 0;
   animation: spark var(--cycle) ease-out infinite;
 }
 
 .impact__spark--one {
-  bottom: 70px;
-  left: -14px;
+  bottom: 96px;
+  left: -26px;
 }
 
 .impact__spark--two {
-  bottom: 28px;
-  left: -20px;
-  width: 12px;
-  height: 12px;
+  bottom: 24px;
+  left: -34px;
+  width: 13px;
+  height: 13px;
   animation-delay: 0.08s;
 }
 
 .impact__spark--three {
-  bottom: 84px;
-  left: 20px;
-  width: 13px;
-  height: 13px;
+  bottom: 118px;
+  left: 8px;
+  width: 14px;
+  height: 14px;
   animation-delay: 0.14s;
 }
 
+/* 데미지 숫자 : 슬라임 머리 위(명찰 아래)에서 떠오름 */
 .damage {
   position: absolute;
-  bottom: 84px;
+  z-index: 2;
+  bottom: calc(100% + 2px);
   left: 50%;
   font-weight: 900;
   white-space: nowrap;
@@ -739,11 +839,11 @@ body {
 }
 
 .damage--normal {
-  font-size: 26px;
+  font-size: 27px;
 }
 
 .damage--critical {
-  font-size: 17px;
+  font-size: 18px;
   color: #ffe27a;
   animation-delay: var(--cycle);
 }
@@ -1074,19 +1174,19 @@ body {
 @keyframes hero-lunge {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translateX(0) rotate(0deg);
   }
-  28% {
-    transform: translateX(-8px);
+  22% {
+    transform: translateX(-12px) rotate(-6deg);
   }
-  42% {
-    transform: translateX(44px);
+  38% {
+    transform: translateX(var(--lunge)) rotate(7deg);
   }
-  54% {
-    transform: translateX(40px);
+  52% {
+    transform: translateX(calc(var(--lunge) - 6px)) rotate(4deg);
   }
   76% {
-    transform: translateX(0);
+    transform: translateX(0) rotate(0deg);
   }
 }
 
@@ -1095,14 +1195,14 @@ body {
   100% {
     rotate: 0deg;
   }
-  28% {
-    rotate: -34deg;
+  22% {
+    rotate: -58deg;
   }
-  44% {
-    rotate: 62deg;
+  40% {
+    rotate: 96deg;
   }
-  58% {
-    rotate: 50deg;
+  56% {
+    rotate: 78deg;
   }
   78% {
     rotate: 0deg;
@@ -1111,59 +1211,65 @@ body {
 
 @keyframes monster-recoil {
   0%,
-  42% {
-    transform: translateX(0) scale(1, 1);
+  40% {
+    transform: translateX(0) rotate(0deg) scale(1, 1);
     filter: none;
   }
-  46% {
-    transform: translateX(11px) scale(0.9, 1.07);
-    filter: brightness(1.12) saturate(0.9);
+  44% {
+    transform: translateX(22px) rotate(7deg) scale(0.84, 1.12);
+    filter: brightness(1.22) saturate(0.85);
   }
-  54% {
-    transform: translateX(-3px) scale(1.05, 0.96);
+  52% {
+    transform: translateX(14px) rotate(3deg) scale(1.06, 0.94);
+    filter: brightness(1.08);
+  }
+  64% {
+    transform: translateX(-4px) rotate(-2deg) scale(0.98, 1.03);
     filter: none;
   }
-  68%,
+  78%,
   100% {
-    transform: translateX(0) scale(1, 1);
+    transform: translateX(0) rotate(0deg) scale(1, 1);
     filter: none;
   }
 }
 
 @keyframes slash {
   0%,
-  42% {
+  39% {
     opacity: 0;
-    scale: 0.55;
+    scale: 0.5;
+    rotate: -16deg;
   }
-  47% {
+  44% {
     opacity: 1;
     scale: 1;
+    rotate: 0deg;
   }
-  60% {
-    opacity: 0.9;
-    scale: 1.12;
+  58% {
+    opacity: 0.85;
+    scale: 1.15;
   }
-  72%,
+  70%,
   100% {
     opacity: 0;
-    scale: 1.2;
+    scale: 1.25;
   }
 }
 
 @keyframes spark {
   0%,
-  44% {
+  41% {
     opacity: 0;
     scale: 0.3;
     rotate: 0deg;
   }
-  54% {
+  50% {
     opacity: 1;
-    scale: 1.2;
+    scale: 1.25;
     rotate: 25deg;
   }
-  72%,
+  70%,
   100% {
     opacity: 0;
     scale: 0.8;
@@ -1233,6 +1339,7 @@ body {
 @media (max-width: 359px) {
   :root {
     --page-x: 10px;
+    --lunge: 22px;
   }
 
   .game-logo__sub {
@@ -1280,7 +1387,17 @@ body {
   }
 
   .nameplate {
-    width: 150px;
+    width: 156px;
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .nameplate__reward {
+    gap: 3px;
+  }
+
+  .reward-chip {
+    padding-right: 5px;
   }
 }
 
@@ -1313,5 +1430,73 @@ body {
 
   .bg__mote {
     opacity: 0.6;
+  }
+}
+
+/* ---------- 배경 추가 애니메이션 ---------- */
+
+@keyframes bird-fly {
+  from {
+    translate: -40px 0;
+  }
+  to {
+    translate: 430px -14px;
+  }
+}
+
+@keyframes bird-flap {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    scale: 0.6;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.15;
+  }
+}
+
+@keyframes petal-fall {
+  0% {
+    opacity: 0;
+    translate: -20px 0;
+    rotate: 0deg;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    translate: 420px 140px;
+    rotate: 540deg;
+  }
+}
+
+@keyframes dash-trail {
+  0%,
+  24% {
+    opacity: 0;
+    transform: scaleX(0.3);
+  }
+  36% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  48%,
+  100% {
+    opacity: 0;
+    transform: scaleX(1.2);
   }
 }

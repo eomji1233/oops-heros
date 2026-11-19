@@ -21,7 +21,7 @@ export const HEROES = {
     name: "히잉토끼",
     kind: "hero",
     Art: HeeingRabbitArt,
-    width: 122,
+    width: 140,
     aspectRatio: 160 / 180,
   },
 } as const satisfies Record<string, CharacterDef>;
@@ -32,7 +32,7 @@ export const MONSTERS = {
     name: "말랑 슬라임",
     kind: "monster",
     Art: GreenSlimeArt,
-    width: 126,
+    width: 144,
     aspectRatio: 170 / 138,
   },
 } as const satisfies Record<string, CharacterDef>;

@@ -1,0 +1,39 @@
+---
+description: 타입/필드 주석은 /** */ JSDoc 금지. 필드는 같은 줄 // 인라인만
+globs: src/types/**/*.ts,src/utils/constants/**/*.ts
+alwaysApply: true
+---
+
+# 타입·필드 주석 규칙
+
+`/** ... */` JSDoc 스타일은 **타입/인터페이스/함수/필드 모두 금지**한다.
+
+## 금지
+
+```typescript
+// ❌
+/** 화면 필터 상태 */
+export interface ForeignerSearchFilters { ... }
+
+// ❌
+/** 전체 평균 입력건수 */
+allAverage: number;
+
+// ❌
+// 전체 평균 입력건수
+allAverage: number;
+```
+
+## 허용
+
+- **필드**: 같은 줄 끝 `//` 인라인만
+- **타입·함수 자체 설명**: 필요하면 바로 위 한 줄 `//` (JSDoc 블록 금지)
+
+```typescript
+// ✅
+// 화면 필터 상태 (API 전송은 buildForeignModelSearchRequest)
+export interface ForeignerSearchFilters {
+  allAverage: number; // 전체 평균 입력건수 (C본부+IP 재직 직원 평균)
+  groupName: string; // 그룹명
+}
+```

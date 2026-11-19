@@ -1,0 +1,132 @@
+---
+description: API 연동 — 스웨거 직접 확인, 요청 범위 준수, 응답 필드명 통일
+globs: src/**/*.{ts,vue}
+alwaysApply: true
+---
+
+# API 연동 규칙
+
+API를 붙일 때, 기존 목업/로컬 변수명은 **무조건 API 응답 필드명과 동일하게** 맞춘다.
+
+## 작업 범위 (CRITICAL)
+
+- **사용자가 말한 요구사항을 최우선**으로 구현한다.
+- 티켓/스웨거/관례상 “있으면 좋겠다”고 생각하는 **부가 기능·보정 로직·클릭 필터·강제 정렬/0 채우기 등**은 임의로 넣지 않는다.
+- 덧붙이고 싶으면 먼저 제안만 한다:  
+  「이런 기능을 추가하는 건 어떨까요?」 → **승인 후에만** 구현.
+- 예: 요약 행 클릭 필터, 검색↔필터 상호 초기화, 응답에 없는 타입 0 채우기, 미래 월 제한 등.
+
+## 스웨거 스펙 확인 (CRITICAL)
+
+백엔드 API 연동·DTO·요청/응답 필드가 필요할 때 **사용자에게 스펙을 물어보지 않는다.**
+
+1. Jira/티켓에 API 경로만 있어도, 요청·응답 스키마는 **스웨거(`/v3/api-docs`)에서 직접 조회**한다.
+2. 응답 DTO·필드명을 사용자에게 “스펙 주세요”라고 요청하지 않는다.
+3. 스웨거 조회에 실패하면 그제야 사용자에게 호스트/접근 방법을 확인한다.
+
+### 먼저 DTMS인지 확인 (CRITICAL)
+
+작업 전에 **지금 붙이는 API가 DTMS인지** 확인한다.
+
+- 경로/프록시가 `/dtms-api` 이거나, 코드 주석·도메인이 DTMS면 **DTMS**다.
+- DTMS면 **9090이 아니라 9190** 스웨거를 본다. 9090(reohub/sandbox)만 보고 경로를 짐작하지 않는다.
+
+**DTMS (9190)**
+
+- UI: `http://15.165.172.247:9190/api/swagger-ui/index.html`
+- docs: `http://15.165.172.247:9190/v3/api-docs`
+- 예: 외국인 모델 입출금 → Model / `findForeignModelPayments`  
+  (`http://15.165.172.247:9190/api/swagger-ui/index.html#/Model/findForeignModelPayments`)
+
+**그 외 (9090, `.env` / vite proxy target 기준)**
+
+- `http://15.165.172.247:9090/v3/api-docs` (sandbox)
+- `http://43.201.128.221:9090/v3/api-docs`
+- `http://43.202.126.161:9090/v3/api-docs`
+
+`curl`로 `/v3/api-docs`를 받아 paths·components.schemas를 파싱해 requestBody/responses `$ref`까지 따라간다. 스웨거에 없는 중간 rename/로컬 래퍼 타입을 만들지 않는다.
+
+## 원칙
+
+- 응답 DTO(`types/*.ts`)에 정의된 필드명을 그대로 사용한다.
+- `orderSummary.totalCount` → `inProgressCount`처럼 UI용 중간 이름·래퍼 타입을 두지 않는다.
+- 요청 DTO 필드명도 API 스펙과 동일하게 맞춘다 (예: `orderGeocode`, `orderGeoCode` 혼용 금지 — 스펙 기준 하나만).
+- enum/코드 값도 API 코드 그대로 사용한다 (예: `ready-to-other` → `DIE`).
+
+## 타입
+
+- 별도 `OrderSummary`, `CancelSummary` 등 로컬 타입 대신 `CancelProjectResponse` 등 API 응답 타입을 직접 사용한다.
+- 필드가 optional이면 템플릿/computed에서 `?? 0` 등으로 처리한다.
+
+## 데이터 저장 · 응답 할당
+
+API 필드명이 이미 맞춰져 있으면 **매핑 함수 없이 ref에 직접 할당**한다.
+
+- `ref<CancelProjectResponse>({})`로 시작한다. `createEmptyProjectStats()` 같은 0 초기화 팩토리는 두지 않는다 — API 응답 전 0 표시용이라 실익 없음.
+- `applyStatsResponse`처럼 필드별 `?? 0`·rename 하는 헬퍼를 만들지 않는다.
+- fetch에서 바로: `projectStats.value = await findCancelProject(payload)`.
+
+optional 필드 기본값이 꼭 필요할 때만 스프레드 한 줄:
+
+```typescript
+projectStats.value = { ...createEmptyProjectStats(), ...res };
+```
+
+단, **0 초기화만 목적이면 팩토리 자체를 두지 말고** 템플릿·computed에서 `?? 0` 처리하거나 API가 항상 값을 주는 전제로 직접 할당한다.
+
+```typescript
+// ❌ 불필요한 0 팩토리 + 매핑 함수
+function createEmptyProjectStats(): Required<CancelProjectResponse> { /* 모든 필드 0 */ }
+const projectStats = ref(createEmptyProjectStats());
+function applyStatsResponse(res: CancelProjectResponse) {
+  projectStats.value = {
+    inProgressCount: res.inProgressCount ?? 0,
+    orderIssuedCount: res.orderIssuedCount ?? 0,
+    // ... 필드마다 반복
+  };
+}
+
+// ✅ 직접 할당
+const projectStats = ref<CancelProjectResponse>({});
+async function fetchDashboardStats() {
+  projectStats.value = await findCancelProject(buildStatsRequest());
+}
+// template/computed: projectStats.inProgressCount ?? 0
+```
+
+## 필터·리셋 — 중복 초기화 제거
+
+API 미연동 영역(목업)과 연동 영역(stats)을 구분한다.
+
+- **API 연동된 stats**: 필터 변경 시 빈 배열로 비울 필요 없음 — `fetch`가 ref를 덮어씀.
+- **아직 목업인 본부/거래처**: 상수에서 스프레드로 복원 (`[...DEFAULT_DIVISION_STATS]`). 매번 `= []` 후 다시 채우는 중복 제거.
+- 필터 함수(`applyDashboardFilters`, `applyClientSearchDashboard`)에서 **의미 없는 빈 배열 초기화**를 넣지 않는다.
+
+```typescript
+// ❌ 항상 []로 비웠다가 목업 다시 세팅
+divisionStats.value = [];
+clientStatusItems.value = [];
+divisionStats.value = buildDivisionStatsForSearch(seed);
+
+// ✅ 목업 영역만 상수 복원, stats는 fetch가 담당
+divisionStats.value = buildDivisionStatsForSearch(seed);
+clientStatusItems.value = [...ALL_CLIENT_STATUS_ITEMS];
+void fetchDashboardStats();
+```
+
+## 예시 (네이밍)
+
+```typescript
+// ❌ 로컬 이름
+const orderSummary = ref({ totalCount: 0, orderCount: 0 });
+orderSummary.value = { totalCount: res.inProgressCount, orderCount: res.orderIssuedCount };
+
+// ✅ API 필드명 그대로
+const projectStats = ref<CancelProjectResponse>({});
+projectStats.value = await findCancelProject(payload);
+```
+
+## 예외
+
+- API에 없고 UI 전용인 상태만 별도 이름 허용 (예: `selectedOrderGeocode`, `detailModalVisible`).
+- 목업 데이터는 API 연동 대상 영역이 아닐 때만 기존 구조 유지. API 붙인 영역의 디폴트/목업만 제거한다.

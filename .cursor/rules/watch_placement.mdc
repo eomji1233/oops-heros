@@ -1,0 +1,23 @@
+---
+description: Vue/TS에서 watch는 스크립트 맨 뒤에 둔다
+globs: src/**/*.{vue,ts}
+alwaysApply: true
+---
+
+# watch 위치
+
+`<script setup>`과 `.ts`에서 `watch` / `watchEffect` 호출은 **스크립트 맨 뒤**에 둔다.
+
+선언(`ref`, `computed`, 함수)을 먼저 쓰고, 구독은 마지막에 둔다.
+
+```typescript
+// ❌ watch가 함수보다 위
+const visible = ref(false);
+watch(visible, () => open());
+function open() {}
+
+// ✅ 선언·함수 다음, 스크립트 끝
+const visible = ref(false);
+function open() {}
+watch(visible, () => open());
+```

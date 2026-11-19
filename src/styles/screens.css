@@ -345,6 +345,83 @@
 
 /* ---------- 용사 화면 ---------- */
 
+.combat-overview {
+  margin-bottom: 12px;
+  padding: 12px 12px 10px;
+  border: 2.5px solid #c9e8dc;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f7fffb 0%, #eefaf4 100%);
+  box-shadow: 0 3px 0 rgba(122, 85, 70, 0.12);
+}
+
+.combat-overview__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.combat-overview__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--c-text);
+}
+
+.combat-overview__active {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-ink-soft);
+}
+
+.combat-overview__active strong {
+  color: var(--c-mint-ink);
+}
+
+.combat-overview__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.combat-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 4px 7px;
+  border-radius: 14px;
+  background-color: rgba(255, 253, 244, 0.92);
+  box-shadow: inset 0 0 0 1.5px rgba(201, 232, 220, 0.9);
+}
+
+.combat-stat__icon {
+  width: 22px;
+  height: 22px;
+}
+
+.combat-stat__label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-ink-soft);
+}
+
+.combat-stat__value {
+  font-size: 15px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.combat-overview__hint {
+  margin: 8px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--c-ink-soft);
+}
+
 .summon-bar {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1722,6 +1799,18 @@
 }
 
 @media (max-width: 359px) {
+  .combat-overview {
+    padding: 10px 8px 8px;
+  }
+
+  .combat-overview__grid {
+    gap: 4px;
+  }
+
+  .combat-stat__value {
+    font-size: 13.5px;
+  }
+
   .summon-bar {
     gap: 6px;
   }

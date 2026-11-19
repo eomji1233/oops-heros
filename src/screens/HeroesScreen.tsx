@@ -4,9 +4,10 @@ import { Modal } from "../components/Modal";
 import { RarityBadge } from "../components/RarityBadge";
 import { ScreenHeader } from "../components/ScreenHeader";
 import GameIcon from "../GameIcons";
+import type { GameIconName } from "../GameIcons";
 import { BALANCE } from "../game/balance.ts";
 import { HERO_LIST, HEROES_BY_ID } from "../game/data/heroes.ts";
-import { formatNumber, formatPercent, formatStat } from "../game/format.ts";
+import { formatCompact, formatNumber, formatPercent, formatStat } from "../game/format.ts";
 import { computeHeroStats, expToNext } from "../game/systems/stats.ts";
 import { useGameStore, useGameUi } from "../game/useGame.ts";
 import type { GameState, HeroId, ItemId } from "../game/types.ts";
@@ -14,6 +15,40 @@ import type { GameState, HeroId, ItemId } from "../game/types.ts";
 type HeroesScreenProps = {
   onUseItem: (itemId: ItemId) => void;
 };
+
+/* ---------- 전체 전투 스탯 (출전 용사 + 누적 처치) ---------- */
+
+function CombatStatPill({ icon, label, value }: { icon: GameIconName; label: string; value: string }) {
+  return (
+    <div className="combat-stat">
+      <GameIcon name={icon} className="combat-stat__icon" />
+      <span className="combat-stat__label">{label}</span>
+      <strong className="combat-stat__value">{value}</strong>
+    </div>
+  );
+}
+
+function CombatOverview({ game }: { game: GameState }) {
+  const stats = computeHeroStats(game, game.activeHeroId);
+  const active = HEROES_BY_ID[game.activeHeroId];
+
+  return (
+    <section className="combat-overview" aria-label="전투 스탯">
+      <div className="combat-overview__head">
+        <h2 className="combat-overview__title">전투 스탯</h2>
+        <span className="combat-overview__active">
+          출전 <strong>{active.name}</strong>
+        </span>
+      </div>
+      <div className="combat-overview__grid">
+        <CombatStatPill icon="sword" label="공격력" value={formatStat(stats.attack)} />
+        <CombatStatPill icon="star" label="처치" value={formatCompact(game.totalKills)} />
+        <CombatStatPill icon="sparkle" label="전투력" value={formatCompact(stats.power)} />
+      </div>
+      <p className="combat-overview__hint">공격력·전투력은 지금 출전 중인 용사 기준이에요. 용사별 상세는 카드를 눌러 확인해요.</p>
+    </section>
+  );
+}
 
 /* ---------- 소환 배너 ---------- */
 
@@ -172,7 +207,9 @@ function HeroesScreen({ onUseItem }: HeroesScreenProps) {
     <div className="screen">
       <ScreenHeader title="용사단" subtitle={`함께하는 동료 ${ownedCount} / ${HERO_LIST.length}`} gold={game.gold} />
       <div className="screen__scroll">
+        <CombatOverview game={game} />
         <SummonBar game={game} onUseItem={onUseItem} />
+        <h2 className="section-title">용사 도감</h2>
         <ul className="hero-grid">
           {HERO_LIST.map((hero) => (
             <li key={hero.id}>

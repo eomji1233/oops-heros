@@ -6,7 +6,7 @@ import type { GameIconName } from "../GameIcons";
 import { BALANCE } from "../game/balance.ts";
 import { worldOf } from "../game/data/worlds.ts";
 import { stageLabel } from "../game/data/worlds.ts";
-import { formatCompact, formatNumber, formatStat } from "../game/format.ts";
+import { formatNumber, formatStat } from "../game/format.ts";
 import { computeHeroStats } from "../game/systems/stats.ts";
 import { hasClaimableReward } from "../game/systems/rewards.ts";
 import { upgradeCost } from "../game/systems/upgrades.ts";
@@ -14,7 +14,7 @@ import { useBattle, useGameStore, useGameUi } from "../game/useGame.ts";
 import type { GameState, HeroStats, UpgradeKind } from "../game/types.ts";
 import type { UpgradeFx } from "../game/store.ts";
 
-/* ---------- 상단 HUD (배경 위에 떠 있음) ---------- */
+/* ---------- 상단 HUD (로고 + 골드만) ---------- */
 
 function GameHud({ gold, killTick }: { gold: number; killTick: number }) {
   return (
@@ -34,61 +34,63 @@ function GameHud({ gold, killTick }: { gold: number; killTick: number }) {
   );
 }
 
-/* ---------- 스테이지 리본 + 전투 상태 ---------- */
+/* ---------- 스테이지 (배경에 스며드는 작은 표시) ---------- */
 
-function StageStatus({ game, stateLabel, tone }: { game: GameState; stateLabel: string; tone: "auto" | "boss" | "down" }) {
+function StageBadge({ game }: { game: GameState }) {
   const world = worldOf(game.stage);
   const pips = Array.from({ length: BALANCE.normalsPerStage }, (_, index) => index < game.killsInStage);
   const bossNext = game.killsInStage >= BALANCE.normalsPerStage;
 
   return (
-    <div className="stage-status">
-      <div className="stage-ribbon">
-        <span className="stage-ribbon__label">{world.name}</span>
-        <strong className="stage-ribbon__value">STAGE {stageLabel(game.stage)}</strong>
-        <span className="stage-pips" role="img" aria-label={`일반 몬스터 ${game.killsInStage} / ${BALANCE.normalsPerStage} 처치`}>
-          {pips.map((done, index) => (
-            <span key={index} className={`stage-pip${done ? " stage-pip--done" : ""}`} />
-          ))}
-          <GameIcon name="crown" className={`stage-pip-boss${bossNext ? " stage-pip-boss--now" : ""}`} />
-        </span>
-      </div>
-
-      <div className={`auto-chip auto-chip--${tone}`} role="status">
-        <span className="auto-chip__dot" aria-hidden="true" />
-        {stateLabel}
-      </div>
+    <div className="stage-badge" aria-label={`${world.name} 스테이지 ${stageLabel(game.stage)}`}>
+      <span className="stage-badge__world">{world.name}</span>
+      <strong className="stage-badge__stage">{stageLabel(game.stage)}</strong>
+      <span className="stage-pips" role="img" aria-label={`일반 몬스터 ${game.killsInStage} / ${BALANCE.normalsPerStage} 처치`}>
+        {pips.map((done, index) => (
+          <span key={index} className={`stage-pip${done ? " stage-pip--done" : ""}`} />
+        ))}
+        <GameIcon name="crown" className={`stage-pip-boss${bossNext ? " stage-pip-boss--now" : ""}`} />
+      </span>
     </div>
   );
 }
 
-/* ---------- 전투 정보 칩 + 보상 버튼 ---------- */
+/* ---------- 전투 영역 보조 UI (보상 · 버프 · 작은 상태) ---------- */
 
-function InfoChip({ icon, label, value }: { icon: GameIconName; label: string; value: string }) {
-  return (
-    <div className="info-chip">
-      <GameIcon name={icon} className="info-chip__icon" />
-      <span className="info-chip__label">{label}</span>
-      <strong className="info-chip__value">{value}</strong>
-    </div>
-  );
-}
-
-function BattleInfo({ game, stats, onOpenRewards }: { game: GameState; stats: HeroStats; onOpenRewards: () => void }) {
+function BattleChrome({
+  game,
+  tone,
+  statusHint,
+  onOpenRewards,
+}: {
+  game: GameState;
+  tone: "auto" | "boss" | "down";
+  statusHint: string | null;
+  onOpenRewards: () => void;
+}) {
   const alert = hasClaimableReward(game) || game.pendingOffline !== null;
   const buffs: string[] = [];
   if (game.buffs.goldBoostSec > 0) buffs.push(`골드 +50% ${Math.ceil(game.buffs.goldBoostSec / 60)}분`);
   if (game.buffs.critBoostSec > 0) buffs.push(`치명타 +15% ${Math.ceil(game.buffs.critBoostSec / 60)}분`);
 
   return (
-    <>
-      <div className="battle-info">
-        <InfoChip icon="sword" label="공격력" value={formatStat(stats.attack)} />
-        <InfoChip icon="star" label="처치" value={formatCompact(game.totalKills)} />
-        <InfoChip icon="sparkle" label="전투력" value={formatCompact(stats.power)} />
+    <div className="battle-chrome">
+      <div className="battle-chrome__left">
+        <StageBadge game={game} />
+        {statusHint ? (
+          <span className={`battle-status battle-status--${tone}`} role="status">
+            <span className="battle-status__dot" aria-hidden="true" />
+            {statusHint}
+          </span>
+        ) : (
+          <span className="battle-status battle-status--auto battle-status--quiet" role="status" aria-label="자동 전투 중">
+            <span className="battle-status__dot" aria-hidden="true" />
+            AUTO
+          </span>
+        )}
       </div>
 
-      <div className="battle-side">
+      <div className="battle-chrome__right">
         <button type="button" className="gift-button" onClick={onOpenRewards} aria-label="출석과 퀘스트 보상">
           <GameIcon name="gift" className="gift-button__icon" />
           {alert && <span className="red-dot red-dot--gift" aria-label="받을 보상이 있어요" />}
@@ -99,7 +101,7 @@ function BattleInfo({ game, stats, onOpenRewards }: { game: GameState; stats: He
           </span>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -179,22 +181,17 @@ function BattleScreen({ onOpenRewards }: { onOpenRewards: () => void }) {
   const battle = useBattle();
   const stats = computeHeroStats(game, game.activeHeroId);
 
-  const stateLabel =
-    battle.phase === "heroDown"
-      ? "쓰러졌어요… 다시 도전!"
-      : battle.phase === "monsterSpawning"
-        ? "다음 몬스터 등장!"
-        : battle.monster.isBoss
-          ? "보스 전투 중!"
-          : "자동 전투 중";
-  const tone = battle.phase === "heroDown" ? "down" : battle.monster.isBoss ? "boss" : "auto";
+  // 평소 자동 전투는 작은 AUTO만. 보스·쓰러짐 등 예외만 짧은 문구.
+  const tone: "auto" | "boss" | "down" =
+    battle.phase === "heroDown" ? "down" : battle.monster.isBoss ? "boss" : "auto";
+  const statusHint =
+    battle.phase === "heroDown" ? "다시 도전" : battle.monster.isBoss ? "보스!" : null;
 
   return (
     <div className="world">
       <BattleBackground />
       <GameHud gold={game.gold} killTick={battle.lastKill?.id ?? 0} />
-      <StageStatus game={game} stateLabel={stateLabel} tone={tone} />
-      <BattleInfo game={game} stats={stats} onOpenRewards={onOpenRewards} />
+      <BattleChrome game={game} tone={tone} statusHint={statusHint} onOpenRewards={onOpenRewards} />
       <BattleArena game={game} battle={battle} stats={stats} />
       <GrowthTray game={game} stats={stats} fx={upgradeFx} />
     </div>

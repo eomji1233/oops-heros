@@ -415,91 +415,91 @@ body {
   color: var(--c-text);
 }
 
-/* ---------- 월드 안의 작은 UI : 스테이지 / 자동 전투 ---------- */
+/* ---------- 월드 안의 작은 UI : 스테이지 / 전투 보조 ---------- */
 
-.stage-status {
+.battle-chrome {
   position: absolute;
-  top: 72px;
+  top: 68px;
   right: var(--page-x);
-  left: calc(var(--page-x) + 8px);
+  left: var(--page-x);
   z-index: 5;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   pointer-events: none;
 }
 
-.stage-ribbon {
-  position: relative;
-  padding: 3px 16px 4px;
-  border: 2.5px solid var(--c-mint-deep);
-  border-radius: 10px;
-  background-color: var(--c-mint);
-  box-shadow: 0 3px 0 var(--c-mint-deep);
-  text-align: center;
-  line-height: 1.15;
+.battle-chrome__left,
+.battle-chrome__right {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.stage-ribbon::before,
-.stage-ribbon::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 7px;
-  width: 16px;
-  height: 16px;
-  border: 2.5px solid var(--c-mint-deep);
-  background-color: #84d3b3;
+.battle-chrome__right {
+  align-items: flex-end;
+  pointer-events: auto;
 }
 
-.stage-ribbon::before {
-  left: -9px;
-  transform: rotate(45deg);
-  border-radius: 3px 0 3px 0;
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px 3px 8px;
+  border: 1.5px solid rgba(61, 124, 100, 0.35);
+  border-radius: 999px;
+  background-color: rgba(255, 253, 244, 0.55);
+  box-shadow: 0 1px 0 rgba(122, 85, 70, 0.12);
+  backdrop-filter: blur(4px);
+  line-height: 1;
+  color: var(--c-mint-ink);
 }
 
-.stage-ribbon::after {
-  right: -9px;
-  transform: rotate(45deg);
-  border-radius: 0 3px 0 3px;
-}
-
-.stage-ribbon__label {
-  display: block;
-  font-size: 9.5px;
+.stage-badge__world {
+  font-size: 10px;
   font-weight: 700;
   color: #3d7c64;
 }
 
-.stage-ribbon__value {
-  display: block;
-  font-size: 16px;
+.stage-badge__stage {
+  font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
   color: var(--c-mint-ink);
 }
 
-.auto-chip {
+.battle-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
+  align-self: flex-start;
+  gap: 5px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background-color: rgba(255, 253, 244, 0.82);
-  box-shadow: 0 2px 0 rgba(122, 85, 70, 0.2);
-  font-size: 12px;
-  font-weight: 900;
-  white-space: nowrap;
+  background-color: rgba(255, 253, 244, 0.5);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   color: var(--c-mint-ink);
+  white-space: nowrap;
 }
 
-.auto-chip__dot {
-  width: 9px;
-  height: 9px;
+.battle-status--quiet {
+  padding: 2px 7px;
+  background-color: rgba(255, 253, 244, 0.38);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: #5a8f78;
+}
+
+.battle-status__dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: #35b27f;
-  box-shadow: 0 0 0 3px rgba(53, 178, 127, 0.25);
+  box-shadow: 0 0 0 2px rgba(53, 178, 127, 0.22);
   animation: dot-pulse 1.3s ease-in-out infinite;
 }
 
@@ -1266,8 +1266,8 @@ body {
     scale: 0.9;
   }
 
-  .stage-status {
-    top: 66px;
+  .battle-chrome {
+    top: 62px;
   }
 }
 

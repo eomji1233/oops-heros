@@ -17,7 +17,15 @@ export type GameIconName =
   | "growth"
   | "shop"
   | "book"
-  | "sparkle";
+  | "sparkle"
+  | "gift"
+  | "ticket"
+  | "clover"
+  | "candy"
+  | "lock"
+  | "check"
+  | "crown"
+  | "clock";
 
 const LINE = "#7a5546";
 
@@ -176,6 +184,95 @@ function IconShapes({ name }: { name: GameIconName }) {
           <path d="M7 11 C 9.5 10.5 11.5 11 13 12" fill="none" stroke="#a8e68a" strokeWidth="2" />
           <path d="M7 15.5 C 9.5 15 11.5 15.5 13 16.5" fill="none" stroke="#ffb7c5" strokeWidth="2" />
           <path d="M23 3.5 L23 11 L25.5 9 L28 11 L28 4.5 Z" fill="#ff9fb4" stroke={LINE} strokeWidth="1.6" />
+        </>
+      );
+
+    case "gift":
+      return (
+        <>
+          <rect x="5" y="13" width="22" height="14" rx="3" fill="#ffb7c5" stroke={LINE} strokeWidth="2" />
+          <rect x="3.5" y="9" width="25" height="6" rx="2.5" fill="#ff9fb4" stroke={LINE} strokeWidth="2" />
+          <path d="M16 9 L16 27" stroke={LINE} strokeWidth="2" />
+          <path d="M16 9 C 12 3 6 5 9 9 Z M16 9 C 20 3 26 5 23 9 Z" fill="#fff3b8" stroke={LINE} strokeWidth="1.8" />
+          <path d="M8 17 L8 23" stroke="#fff" strokeWidth="2" opacity="0.8" />
+        </>
+      );
+
+    case "ticket":
+      return (
+        <>
+          <path
+            d="M3.5 10 L28.5 10 L28.5 14 C 25.5 14 25.5 18 28.5 18 L28.5 22 L3.5 22 L3.5 18 C 6.5 18 6.5 14 3.5 14 Z"
+            fill="#ffe59a"
+            stroke={LINE}
+            strokeWidth="2"
+          />
+          <path d="M11 11.5 L11 20.5" stroke={LINE} strokeWidth="1.6" strokeDasharray="2 2" />
+          <path d="M20 12.5 L21.2 15.2 L24 15.5 L21.9 17.4 L22.5 20 L20 18.6 L17.5 20 L18.1 17.4 L16 15.5 L18.8 15.2 Z" fill="#ff9fb4" stroke={LINE} strokeWidth="1.2" />
+        </>
+      );
+
+    case "clover":
+      return (
+        <>
+          <circle cx="11" cy="11" r="6" fill="#a8e68a" stroke={LINE} strokeWidth="2" />
+          <circle cx="21" cy="11" r="6" fill="#a8e68a" stroke={LINE} strokeWidth="2" />
+          <circle cx="11" cy="20" r="6" fill="#a8e68a" stroke={LINE} strokeWidth="2" />
+          <circle cx="21" cy="20" r="6" fill="#a8e68a" stroke={LINE} strokeWidth="2" />
+          <circle cx="16" cy="15.5" r="4" fill="#c9f3b0" />
+          <path d="M16 18 C 16 23 18 27 22 29" fill="none" stroke={LINE} strokeWidth="2" />
+          <path d="M8 8.5 C 9 7 10.5 6.6 12 7.2" fill="none" stroke="#fff" strokeWidth="1.6" opacity="0.9" />
+        </>
+      );
+
+    case "candy":
+      return (
+        <>
+          <path d="M5 10 L11 14 L11 18 L5 22 C 3 18 3 14 5 10 Z" fill="#ffb7c5" stroke={LINE} strokeWidth="2" />
+          <path d="M27 10 L21 14 L21 18 L27 22 C 29 18 29 14 27 10 Z" fill="#ffb7c5" stroke={LINE} strokeWidth="2" />
+          <circle cx="16" cy="16" r="8.5" fill="#ffd9a8" stroke={LINE} strokeWidth="2" />
+          <path d="M10.5 13 C 13 12 16 14 15 17 C 14 20 18 21 21 19" fill="none" stroke="#ff9fb4" strokeWidth="2.4" />
+          <path d="M11 11.5 C 12 10 13.5 9.4 15 9.6" fill="none" stroke="#fff" strokeWidth="1.8" opacity="0.9" />
+        </>
+      );
+
+    case "lock":
+      return (
+        <>
+          <path d="M10 14 L10 10 C 10 4 22 4 22 10 L22 14" fill="none" stroke={LINE} strokeWidth="2.4" />
+          <rect x="6" y="13" width="20" height="15" rx="4" fill="#cfc4bb" stroke={LINE} strokeWidth="2" />
+          <circle cx="16" cy="20" r="2.6" fill="#7a5546" />
+          <path d="M16 21 L16 24" stroke="#7a5546" strokeWidth="2" />
+        </>
+      );
+
+    case "check":
+      return (
+        <>
+          <circle cx="16" cy="16" r="12" fill="#a8e8cd" stroke={LINE} strokeWidth="2" />
+          <path d="M10 16.5 L14.5 21 L22.5 11.5" fill="none" stroke="#fff" strokeWidth="3.4" />
+          <path d="M10 16.5 L14.5 21 L22.5 11.5" fill="none" stroke="#2d5c4a" strokeWidth="1.4" />
+        </>
+      );
+
+    case "crown":
+      return (
+        <>
+          <path d="M4 24 L5 10 L11.5 16 L16 7 L20.5 16 L27 10 L28 24 Z" fill="#ffd36e" stroke={LINE} strokeWidth="2" />
+          <path d="M5 21 L27 21" stroke="#e5a93a" strokeWidth="2" />
+          <circle cx="16" cy="6.5" r="2" fill="#ff9fb4" stroke={LINE} strokeWidth="1.4" />
+          <circle cx="5" cy="9.5" r="1.8" fill="#8ed6ff" stroke={LINE} strokeWidth="1.2" />
+          <circle cx="27" cy="9.5" r="1.8" fill="#8ed6ff" stroke={LINE} strokeWidth="1.2" />
+        </>
+      );
+
+    case "clock":
+      return (
+        <>
+          <circle cx="16" cy="17" r="11.5" fill="#fff6ec" stroke={LINE} strokeWidth="2" />
+          <path d="M16 10.5 L16 17 L20.5 19.5" fill="none" stroke={LINE} strokeWidth="2.4" />
+          <circle cx="7" cy="7" r="3.6" fill="#ffb7c5" stroke={LINE} strokeWidth="1.8" />
+          <circle cx="25" cy="7" r="3.6" fill="#ffb7c5" stroke={LINE} strokeWidth="1.8" />
         </>
       );
   }

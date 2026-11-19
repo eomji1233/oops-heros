@@ -76,6 +76,7 @@ export const MONSTERS_BY_ID: Record<string, MonsterDef> = Object.fromEntries(
 export const WORLDS: WorldDef[] = [
   {
     id: "meadow",
+    unlockText: "처음부터 열려 있어요",
     name: "초원",
     description: "햇살 가득한 동화 속 초원. 용사단의 첫 모험이 시작되는 곳.",
     implemented: true,
@@ -94,6 +95,7 @@ export const WORLDS: WorldDef[] = [
   },
   {
     id: "forest",
+    unlockText: "초원 1-10 보스 처치",
     name: "속삭이는 숲",
     description: "나뭇잎이 속삭이는 깊고 푸른 숲속.",
     implemented: false,
@@ -105,6 +107,7 @@ export const WORLDS: WorldDef[] = [
   },
   {
     id: "lake",
+    unlockText: "속삭이는 숲 클리어",
     name: "신비한 호수",
     description: "별빛이 내려앉은 거울 같은 호수.",
     implemented: false,
@@ -116,6 +119,7 @@ export const WORLDS: WorldDef[] = [
   },
   {
     id: "cloud",
+    unlockText: "신비한 호수 클리어",
     name: "구름 왕국",
     description: "솜사탕 구름 위에 떠 있는 하늘의 왕국.",
     implemented: false,
@@ -127,6 +131,7 @@ export const WORLDS: WorldDef[] = [
   },
   {
     id: "castle",
+    unlockText: "구름 왕국 클리어",
     name: "마법의 성",
     description: "마법사들이 사라진 신비한 성. 모험의 마지막 무대.",
     implemented: false,

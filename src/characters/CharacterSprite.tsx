@@ -3,6 +3,8 @@ import type { CharacterDef } from "./types";
 
 type CharacterSpriteProps = {
   character: CharacterDef;
+  /** 가로 크기(px)를 바꾸고 싶을 때 (도감 썸네일 등). 비율은 유지된다. */
+  size?: number;
 };
 
 /**
@@ -10,11 +12,11 @@ type CharacterSpriteProps = {
  * 실제 이미지(imageSrc)가 있으면 <img>, 없으면 임시 SVG를 렌더링합니다.
  * 크기는 character.width / aspectRatio로 고정되어 있어 교체해도 레이아웃이 유지됩니다.
  */
-function CharacterSprite({ character }: CharacterSpriteProps) {
+function CharacterSprite({ character, size }: CharacterSpriteProps) {
   const { Art, imageSrc, name, kind, width, aspectRatio } = character;
 
   const style = {
-    "--sprite-width": `${width}px`,
+    "--sprite-width": `${size ?? width}px`,
     "--sprite-ratio": aspectRatio,
   } as CSSProperties;
 

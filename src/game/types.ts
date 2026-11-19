@@ -83,6 +83,8 @@ export type WorldDef = {
   description: string;
   /** 실제로 플레이 가능한 월드인지 (배경/몬스터가 준비되었는지) */
   implemented: boolean;
+  /** 이 월드를 열기 위한 조건 설명 (앞 월드를 모두 클리어해야 열린다) */
+  unlockText: string;
   stageCount: number;
   monsterIds: string[];
   bossIds: string[];

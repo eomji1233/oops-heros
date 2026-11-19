@@ -72,7 +72,7 @@ export const BALANCE = {
     /** 이 시간(초)보다 짧은 부재는 보상하지 않는다 */
     minSeconds: 60,
     /** 실제 전투 수익 대비 오프라인 수익 비율 */
-    efficiency: 0.4,
+    efficiency: 0.25,
   },
 
   daily: { checkInGold: 200, streakBonusGold: 40, maxStreakBonus: 7 },

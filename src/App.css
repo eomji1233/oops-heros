@@ -22,7 +22,6 @@
   /* 월드 치수 */
   --ground-h: 340px;
   --feet: 188px;
-  --cycle: 2.4s;
   --lunge: 38px;
 
   /* 공통 */
@@ -556,13 +555,6 @@ body {
   transform-origin: 50% 100%;
 }
 
-.fighter__lunge {
-  animation: hero-lunge var(--cycle) ease-in-out infinite;
-}
-
-.fighter__recoil {
-  animation: monster-recoil var(--cycle) ease-out infinite;
-}
 
 /* 돌진 중에만 보이는 속도선 */
 .dash-trail {
@@ -578,7 +570,6 @@ body {
     linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9)) 4px 34px / 50px 6px no-repeat;
   border-radius: 999px;
   transform-origin: 100% 50%;
-  animation: dash-trail var(--cycle) ease-out infinite;
 }
 
 .fighter__name {
@@ -634,7 +625,6 @@ body {
 
 .art-sword {
   transform-origin: 0 0;
-  animation: sword-swing var(--cycle) ease-in-out infinite;
 }
 
 .art-blink {
@@ -788,7 +778,7 @@ body {
   height: 62px;
   opacity: 0;
   filter: drop-shadow(0 2px 0 rgba(122, 85, 70, 0.3));
-  animation: slash var(--cycle) ease-out infinite;
+  animation: hit-slash 0.45s ease-out both;
 }
 
 .impact__spark {
@@ -797,7 +787,7 @@ body {
   width: 20px;
   height: 20px;
   opacity: 0;
-  animation: spark var(--cycle) ease-out infinite;
+  animation: hit-spark 0.5s ease-out both;
 }
 
 .impact__spark--one {
@@ -835,7 +825,7 @@ body {
   paint-order: stroke fill;
   text-shadow: 0 3px 0 var(--c-ink);
   transform: translateX(-50%);
-  animation: damage-rise calc(var(--cycle) * 2) ease-out infinite;
+  animation: hit-damage 0.95s ease-out both;
 }
 
 .damage--normal {
@@ -845,7 +835,6 @@ body {
 .damage--critical {
   font-size: 18px;
   color: #ffe27a;
-  animation-delay: var(--cycle);
 }
 
 /* =========================================================
@@ -1171,139 +1160,6 @@ body {
   }
 }
 
-@keyframes hero-lunge {
-  0%,
-  100% {
-    transform: translateX(0) rotate(0deg);
-  }
-  22% {
-    transform: translateX(-12px) rotate(-6deg);
-  }
-  38% {
-    transform: translateX(var(--lunge)) rotate(7deg);
-  }
-  52% {
-    transform: translateX(calc(var(--lunge) - 6px)) rotate(4deg);
-  }
-  76% {
-    transform: translateX(0) rotate(0deg);
-  }
-}
-
-@keyframes sword-swing {
-  0%,
-  100% {
-    rotate: 0deg;
-  }
-  22% {
-    rotate: -58deg;
-  }
-  40% {
-    rotate: 96deg;
-  }
-  56% {
-    rotate: 78deg;
-  }
-  78% {
-    rotate: 0deg;
-  }
-}
-
-@keyframes monster-recoil {
-  0%,
-  40% {
-    transform: translateX(0) rotate(0deg) scale(1, 1);
-    filter: none;
-  }
-  44% {
-    transform: translateX(22px) rotate(7deg) scale(0.84, 1.12);
-    filter: brightness(1.22) saturate(0.85);
-  }
-  52% {
-    transform: translateX(14px) rotate(3deg) scale(1.06, 0.94);
-    filter: brightness(1.08);
-  }
-  64% {
-    transform: translateX(-4px) rotate(-2deg) scale(0.98, 1.03);
-    filter: none;
-  }
-  78%,
-  100% {
-    transform: translateX(0) rotate(0deg) scale(1, 1);
-    filter: none;
-  }
-}
-
-@keyframes slash {
-  0%,
-  39% {
-    opacity: 0;
-    scale: 0.5;
-    rotate: -16deg;
-  }
-  44% {
-    opacity: 1;
-    scale: 1;
-    rotate: 0deg;
-  }
-  58% {
-    opacity: 0.85;
-    scale: 1.15;
-  }
-  70%,
-  100% {
-    opacity: 0;
-    scale: 1.25;
-  }
-}
-
-@keyframes spark {
-  0%,
-  41% {
-    opacity: 0;
-    scale: 0.3;
-    rotate: 0deg;
-  }
-  50% {
-    opacity: 1;
-    scale: 1.25;
-    rotate: 25deg;
-  }
-  70%,
-  100% {
-    opacity: 0;
-    scale: 0.8;
-    rotate: 50deg;
-  }
-}
-
-/* 데미지 숫자 : 2사이클(4.8s) 동안 한 번 보였다가 사라짐 */
-@keyframes damage-rise {
-  0%,
-  22% {
-    opacity: 0;
-    translate: 0 14px;
-    scale: 0.6;
-  }
-  26% {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1.3;
-  }
-  30% {
-    scale: 1;
-  }
-  42% {
-    opacity: 1;
-    translate: 0 -18px;
-  }
-  50%,
-  100% {
-    opacity: 0;
-    translate: 0 -34px;
-  }
-}
-
 @keyframes dot-pulse {
   50% {
     opacity: 0.4;
@@ -1344,6 +1200,10 @@ body {
 
   .game-logo__sub {
     display: none;
+  }
+
+  .game-logo {
+    margin-top: 10px;
   }
 
   .gold-counter__value {
@@ -1415,17 +1275,10 @@ body {
   .game *,
   .game *::before,
   .game *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .damage--normal {
-    opacity: 1;
-  }
-
-  .impact__slash,
-  .impact__spark {
-    opacity: 0;
+    /* 움직임을 없애되, 한 번짜리 연출은 끝 상태(사라짐)로 바로 도달하게 한다 */
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 
   .bg__mote {
@@ -1484,19 +1337,3 @@ body {
   }
 }
 
-@keyframes dash-trail {
-  0%,
-  24% {
-    opacity: 0;
-    transform: scaleX(0.3);
-  }
-  36% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-  48%,
-  100% {
-    opacity: 0;
-    transform: scaleX(1.2);
-  }
-}

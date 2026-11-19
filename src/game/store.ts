@@ -39,6 +39,7 @@ const MAX_TOASTS = 3;
 
 export class GameStore {
   private storage: SaveStorage;
+  private clock: () => number;
   private game: GameState;
   private battle: BattleState;
   private ui: UiSnapshot;
@@ -51,8 +52,11 @@ export class GameStore {
   private fxId = 0;
   private rng: () => number = Math.random;
 
-  constructor(storage: SaveStorage, now: number = Date.now()) {
+  /** clock: 현재 시각(ms)을 돌려주는 함수. 테스트에서는 가짜 시계를 넣을 수 있다. */
+  constructor(storage: SaveStorage, clock: () => number = Date.now) {
     this.storage = storage;
+    this.clock = clock;
+    const now = clock();
     let loaded: unknown = null;
     const raw = storage.load();
     if (raw) {
@@ -121,7 +125,7 @@ export class GameStore {
       notices.push(...result.notices);
     }
 
-    const wall = Date.now();
+    const wall = this.clock();
     const gameChanged = game !== this.game;
     this.battle = battle;
     if (gameChanged) {
@@ -148,11 +152,11 @@ export class GameStore {
 
   /** 앱이 가려지거나 닫히기 직전에 호출 */
   flush(): void {
-    this.persist(Date.now());
+    this.persist(this.clock());
   }
 
   /** 앱이 다시 보일 때: 자리를 비운 시간을 오프라인 보상으로 환산 */
-  resume(now: number = Date.now()): void {
+  resume(now: number = this.clock()): void {
     const next = this.applyElapsedAndRollover(this.game, now, false);
     this.game = next;
     this.persist(now);
@@ -186,7 +190,7 @@ export class GameStore {
 
   private commit(game: GameState, options: { save?: boolean } = {}): void {
     this.game = game;
-    if (options.save !== false) this.persist(Date.now());
+    if (options.save !== false) this.persist(this.clock());
     this.setUi({ game: this.game });
   }
 
@@ -269,14 +273,14 @@ export class GameStore {
 
   checkIn(): CheckInResult {
     const draft = cloneGame(this.game);
-    const result = claimCheckIn(draft, Date.now());
+    const result = claimCheckIn(draft, this.clock());
     if (result.ok) this.commit(draft);
     return result;
   }
 
   claimQuest(questId: string): QuestClaimResult {
     const draft = cloneGame(this.game);
-    const result = claimQuest(draft, questId, Date.now());
+    const result = claimQuest(draft, questId, this.clock());
     if (result.ok) this.commit(draft);
     return result;
   }
@@ -296,12 +300,26 @@ export class GameStore {
         draft.items[itemId] += count;
         this.commit(draft);
       },
-      setLastSeen: (ms: number) => {
+      unlockAllHeroes: () => {
         const draft = cloneGame(this.game);
-        draft.lastSeen = ms;
-        draft.maxSeen = ms;
+        for (const id of Object.keys(draft.heroes) as HeroId[]) draft.heroes[id].owned = true;
+        this.commit(draft);
+      },
+      setStage: (world: number, stage: number, killsInStage = 0) => {
+        const draft = cloneGame(this.game);
+        draft.stage = { world, stage };
+        draft.bestStage = { world, stage };
+        draft.killsInStage = killsInStage;
+        this.commit(draft);
+        this.battle = createBattle(draft);
+      },
+      /** 앱을 ms 만큼 닫아 두었다가 다시 켠 것처럼 만든다 */
+      simulateAbsence: (ms: number) => {
+        const draft = cloneGame(this.game);
+        draft.lastSeen = this.clock() - ms;
+        draft.maxSeen = draft.lastSeen;
         this.game = draft;
-        this.storage.save(JSON.stringify(draft));
+        this.resume(this.clock());
       },
       state: () => this.game,
       reset: () => {
